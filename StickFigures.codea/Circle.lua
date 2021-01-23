@@ -26,7 +26,7 @@ function Circle:draw()
     fill(255, 14, 0)
     popMatrix()
     popMatrix() popStyle()
-
+--[[
     pushMatrix() pushStyle()
     local bbox = self:boundingBox()
     resetMatrix()
@@ -38,7 +38,7 @@ function Circle:draw()
     fill(255)
     text('' .. tostring(self.globalScale), bbox.x + bbox.w / 2, bbox.y + bbox.h / 2)
     popMatrix() popStyle()
-
+--]]
 end
 
 function Circle:boundingBox()
@@ -49,7 +49,6 @@ function Circle:boundingBox()
          x = x - (w / 2)
          y = y - (h / 2)
     end
-  --  return vec4(x, y, w * self.scale.x, h * self.scale.y)
     return {x = x, y = y, w = w * self.scale.x, h = h * self.scale.y}
 end
 
@@ -59,5 +58,4 @@ end
 
 function Circle:touched(touch)
     Transform.touched(self, touch)
-    -- Codea does not automatically call this method
 end

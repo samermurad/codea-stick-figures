@@ -10,13 +10,11 @@ function stickman()
         parent = pelvis,
         pos = vec2(0, 0),
         length = 50,
-      --  rot = 90
     }
     local torso = Stick{
         parent = waist,
         pos = vec2(50, 0),
         length = 50,
-       -- rot = -90
     }
     local neck = Circle{
         parent = torso,
@@ -131,13 +129,14 @@ function setup()
     parent = stick,
     pos = vec2(150, 0)
     }
-    boneOne = Bone()
+    boneOne = Bone{
+        parent = stick,
+    }
     boneTwo = Bone({
-    parent = boneOne,
+    parent = stick2,
     pos = vec2(150, 0)
     })
     list = {
-    --[[
     stick,
     stick2,
     Stick{
@@ -145,13 +144,6 @@ function setup()
     connected = false,
     pos = vec2(160, 0)
     },
-    --[[
-    DottedCircle({
-    cx = WIDTH * 7/8,
-    CY = HEIGHT * 2/3
-    }),
-    --]]
-    --[[
     boneOne,
     boneTwo,
     Bone({
@@ -162,10 +154,8 @@ function setup()
         parent = boneTwo,
         pos = vec2(0, 80)
     },
-]]--
-    stickman()
-   -- {club()}
     }
+    concat(list, {stickman()})
     concat(list, {club()})
 
     

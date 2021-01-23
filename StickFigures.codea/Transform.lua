@@ -18,7 +18,7 @@ function Transform:init(opt)
     self.mtx = Transform.CTM(self)
     self.globalPos = vec2(0,  0)
     self.globalRot = 0
-    self.globalScale = vec2(self.mtx[1], self.mtx[6])
+    self.globalScale = vec2(self.mtx[1] / 1, self.mtx[6] / 1)
     self.forward = vec2(self.mtx[1], self.mtx[2]):normalize()
     self.layout = 0
     self.didUpdate = true
@@ -84,14 +84,9 @@ function Transform:setSelfDidLayout()
     self.lastRot = self.rot
     self.lastScale = vec2(self.scale:unpack())
 end
-function Transform:rotAngle()
-    local fx, fy = self.forward:unpack()
-    local angle = math.atan2(fy, fx)
-    return angle * mathX.rad2deg
-end
+
 function Transform:boundingBox()
     local x,y = Transform.PosToScreenPos(self):unpack()
-    --self.globalPos:unpack()
     local w, h = 75, 75 -- dummy size for base transform
     
     if self.mode == CENTER then

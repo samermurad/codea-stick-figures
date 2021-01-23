@@ -138,7 +138,7 @@ function Stick:boundingBox()
     return vec4(x - yOffset, y - yOffset, x2, y2 + yOffset)
 end
 function Stick:inBounds(t)
-    return pointIsInPoly(t.pos, self.polygonPoints)
+    return isPointInPoly(t.pos, self.polygonPoints)
     --[[
     local bbox = self:boundingBox()
     local x = math.min(bbox.x, bbox.z)

@@ -1,7 +1,8 @@
-DottedCircle = class()
+DottedCircle = class(Transform)
 
 function DottedCircle:init(opt)
-    -- you can accept and set parameters here
+    opt = opt or {}
+    Transform.init(self, opt)
     self.cx = opt.cx or WIDTH / 2
     self.cy = opt.cy or HEIGHT / 2
     self.sides = opt.sides or 2

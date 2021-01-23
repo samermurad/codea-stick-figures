@@ -8,7 +8,6 @@ function T2DEditor:init()
     self.doDraw = false
     self.gizmo = Gizmo()
   --  touches.addHandler(self)
-    -- you can accept and set parameters here
 end
 
 function T2DEditor:select(transform)

@@ -4,7 +4,6 @@ function Gizmo:init(opt)
     opt = opt or {}
     Transform.init(self, opt)
     self.target = nil
-    -- you can accept and set parameters here
 end
 
 function Gizmo:setTarget(target)
@@ -34,7 +33,6 @@ function Gizmo:onDraw()
     stroke(229, 232, 49)
     
     ellipse(0,0, 55)
-    -- Codea does not automatically call this method
 end
 
 function Gizmo:touched(touch)

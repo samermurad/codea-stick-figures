@@ -8,28 +8,17 @@ function Bone:init(opt)
 end
 
 function Bone:update()
-   -- print('shoyld upadate')
     Transform.update(self)
-    --print('wot')
 end
 
-function Bone:draw()
-   -- Transform.draw(self)
-    self:update()
-    pushMatrix() pushStyle()
-    resetMatrix()
-    modelMatrix(self.mtx)
-    --zLevel(1)
+function Bone:onDraw()
     stroke(self.color)
     fill(self.color)
     strokeWidth(5)
     line(0, 0, 15, 0)
     ellipse(0, 0, 25)
-    popMatrix() popStyle()
-    -- Codea does not automatically call this method
 end
 
 function Bone:touched(touch)
-    Transform.touched(self, touched)
-    -- Codea does not automatically call this method
+    Transform.touched(self, touch)
 end
