@@ -90,6 +90,41 @@ function stickman()
     
     return pelvis, waist, torso, neck, head, leftArm, leftLowerArm, rightArm, rightLowerArm, leftThigh, lefLeg, rightThigh, rightLeg
 end
+
+function club()
+    local bCol = color(50)
+    local mCol = color(161, 193, 199)
+    local base = Stick{
+        pos = vec2(WIDTH / 2 + 150, HEIGHT / 2),
+        color = bCol
+    }
+    local head = Circle{
+        r = 10,
+        color = bCol,
+        pos = vec2(base.length, 0),
+        parent = base,
+    }
+    local mace1 = Circle{
+        r = 75,
+        scale = vec2(0.2, 1),
+        parent = head,
+        color = mCol,
+    
+    }
+    local mace2 = Circle{
+        r = 75,
+        scale = vec2(0.2, 1),
+        color = mCol,
+        pos = vec2(mace1.r * mace1.scale.x, 0),
+        parent = head
+    }
+    return base, head, mace1, mace2
+end
+function concat(t1, t2)
+    for _,v in ipairs(t2) do
+        table.insert(t1, v)
+    end
+end
 function setup()
     stick = Stick()
     stick2 = Stick{
@@ -101,7 +136,6 @@ function setup()
     parent = boneOne,
     pos = vec2(150, 0)
     })
-    -- selected_idx = 1
     list = {
     --[[
     stick,
@@ -130,10 +164,10 @@ function setup()
     },
 ]]--
     stickman()
+   -- {club()}
     }
-    table.insert(list, Stick{
-    pos = vec2(WIDTH / 2 + 150, HEIGHT / 2)
-    })
+    concat(list, {club()})
+
     
     touches.addHandler(list)
     local colors = {}
@@ -198,7 +232,7 @@ function setup()
 end
 
 function draw()
-    background(40, 40, 50)
+    background(128)
     list:draw()
     _editor:draw()
 end

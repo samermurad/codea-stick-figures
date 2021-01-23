@@ -92,6 +92,11 @@ function applyRotation(rot, m)
     return m
 end
 -- getters
+function Transform:rotAngle()
+    local fx, fy = self.forward:unpack()
+    local angle = math.atan2(fy, fx)
+    return angle * mathX.rad2deg
+end
 function Transform:boundingBox()
     local x,y = Transform.PosToScreenPos(self):unpack()
     --self.globalPos:unpack()

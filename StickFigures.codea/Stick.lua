@@ -37,6 +37,7 @@ function Stick:onDraw()
     
     
     pushMatrix() pushStyle()
+    --[[
     local bbox = self:boundingBox()
     local cx = bbox.x + bbox.z / 2
     local cy = bbox.y + bbox.w / 2
@@ -59,7 +60,7 @@ function Stick:onDraw()
             first = v
         end
     end
-    
+    ]]--
     popMatrix() popStyle()
 end
 
