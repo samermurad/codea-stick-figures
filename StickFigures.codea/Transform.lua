@@ -22,6 +22,7 @@ function Transform:init(opt)
     self.forward = vec2(self.mtx[1], self.mtx[2]):normalize()
     self.layout = 0
     self.didUpdate = true
+    self.touchPoints = {}
 end
 -- Matrix Calcuation Helpers
 function Transform.CTM(transform)
@@ -61,6 +62,28 @@ function applyRotation(rot, m)
     m[6] = math.cos(angle)
     return m
 end
+
+
+function Transform:buildTouchPoints()
+    local sizeX, sizeY = 75, 75
+    local ts = {
+        vec2(-1, -1),
+        vec2(1, -1),
+        vec2(1, 1),
+        vec2(-1, 1)
+    }
+    
+    local p = {}
+    for _, t in ipairs(ts) do
+        local m = matrix()
+        --local x = 
+        m = m:translate(t.x * sizeX / 2, t.y * sizeY / 2)
+        m = m * self.mtx
+        table.insert(p, vec2(m[13], m[14]))
+    end
+    
+    return p
+end
 -- getters
 function Transform:isNeedsLayout()
     local isNeeds = false
@@ -85,24 +108,8 @@ function Transform:setSelfDidLayout()
     self.lastScale = vec2(self.scale:unpack())
 end
 
-function Transform:boundingBox()
-    local x,y = Transform.PosToScreenPos(self):unpack()
-    local w, h = 75, 75 -- dummy size for base transform
-    
-    if self.mode == CENTER then
-        x = x - (w / 2)
-        y = y - (h / 2)
-        --w = w - w / 2
-    end
-    
-    return {x = x, y = y, w = w * self.scale.x, h = h * self.scale.y}
-end
-
-function Transform:inBounds(t)
-    local bbox = self:boundingBox()
-    local x2 = bbox.x + bbox.w
-    local y2 = bbox.y + bbox.h
-    return t.pos.x >= bbox.x and t.pos.x <= x2 and t.pos.y >= bbox.y and t.pos.y <= y2
+function Transform:hitTest(t)
+    return isPointInPoly(t.pos, self.touchPoints)
 end
 --
 function Transform:update()
@@ -121,6 +128,9 @@ function Transform:update()
         
         -- global scale
         self.globalScale = vec2(self.mtx[1]/1, self.mtx[6]/1)
+        
+        -- touch points
+        self.touchPoints = self:buildTouchPoints()
         self:setSelfDidLayout()
         self.didUpdate = true
     else

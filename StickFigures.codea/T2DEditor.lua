@@ -15,10 +15,62 @@ function T2DEditor:select(transform)
         print('new selection', transform.globalPos, transform.name)
         self.sTransform = transform
         self.doDraw = self.sTransform ~= nil
+        if self.doDraw then
+            self:refreshParametersApi()
+        else
+            parameter.clear()
+        end
         print('should draw', self.doDraw)
     end
 end
 
+function T2DEditor:refreshParametersApi()
+    local t = self.sTransform
+    local rot = t.rot
+    local pos = t.pos
+    local scl = t.scale
+    
+    parameter.clear()
+    
+    parameter.text(t.name)
+    if t.parent then
+        parameter.action('Jump to Root Parent', function()
+            local p = t.parent
+            while p.parent ~= nil do
+                p = p.parent
+            end
+            self:select(p)
+        end)
+        parameter.action('Jump to Next Parent', function()
+            self:select(t.parent)
+        end)
+    end
+    parameter.integer(
+    'itemRot', -360, 360, rot,
+    function(val)
+         t.rot = val
+    end
+    )
+    
+    parameter.number('itemX', -WIDTH, WIDTH, pos.x, function(val)
+        t.pos.x = val
+    end)
+    parameter.number('itemY', -HEIGHT, HEIGHT, pos.y, function(val)
+        t.pos.y = val
+    end)
+    
+    parameter.number('scaleX', -5, 5, scl.x, function(val)
+        t.scale.x = val
+    end)
+    parameter.number('scaleY',-5, 5, scl.y, function(val)
+        t.scale.y = val
+    end)
+    if t.color then
+        parameter.color('itemColor', t.color, function(val)
+            t.color = val
+        end)
+    end
+end
 function T2DEditor:calculateGizmoPos()
     
 end
@@ -28,6 +80,7 @@ function T2DEditor:update()
     if self.sTransform ~= nil then
      --   print('seetting the gizmo', self.sTransform.globalPos)
         self.gizmo.pos = Transform.PosToScreenPos(self.sTransform)
+        self.gizmo.rot = self.sTransform.globalRot
     end
     
 end
@@ -35,10 +88,28 @@ function T2DEditor:draw()
     self:update()
     if self.doDraw then
         self.gizmo:draw()
+        pushMatrix() pushStyle()
+        resetMatrix()
+        stroke(153, 233, 80, 162)
+        strokeWidth(1)
+        noSmooth()
+        local p = self.sTransform.touchPoints
+        local first
+        for i, v in pairs(p) do
+            
+            if i == 1 then
+                first = v
+                line(first.x, first.y, p[#p].x, p[#p].y)
+            end
+            if first then
+                line(first.x, first.y, v.x, v.y)
+                first = v
+            end
+        end
+        popMatrix() popStyle()
     end
-    pushMatrix() pushStyle()
-    resetMatrix()
-    popMatrix() popStyle()
+    
+    
     -- Codea does not automatically call this method
 end
 
