@@ -229,6 +229,7 @@ function setup()
     parameter.watch('_editor.sTransform.mtx')
     _editor = T2DEditor()
     print(projectionMatrix())
+  --  print(true or false)
 end
 
 function draw()

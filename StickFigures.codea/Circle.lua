@@ -36,7 +36,7 @@ function Circle:draw()
     stroke(255, 14, 0)
     line(bbox.x, bbox.y, bbox.x + self.forward.x * 25, bbox.y + self.forward.y * 25)
     fill(255)
-    text(self.name, bbox.x + bbox.w / 2, bbox.y + bbox.h / 2)
+    text('' .. tostring(self.globalScale), bbox.x + bbox.w / 2, bbox.y + bbox.h / 2)
     popMatrix() popStyle()
 
 end

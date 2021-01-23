@@ -4,6 +4,7 @@
 <dict>
 	<key>Buffer Order</key>
 	<array>
+		<string>polyPoints</string>
 		<string>DottedCircle</string>
 		<string>Transform</string>
 		<string>Gizmo</string>

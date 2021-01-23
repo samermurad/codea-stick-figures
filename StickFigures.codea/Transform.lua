@@ -15,46 +15,16 @@ function Transform:init(opt)
         end
     end
     self.mode = opt.mode or CENTER
-    self.mtx = Transform.GetGlobalCTM(self)
+    self.mtx = Transform.CTM(self)
     self.globalPos = vec2(0,  0)
     self.globalRot = 0
-    self.globalScale = vec2(1,1)
+    self.globalScale = vec2(self.mtx[1], self.mtx[6])
     self.forward = vec2(self.mtx[1], self.mtx[2]):normalize()
+    self.layout = 0
+    self.didUpdate = true
 end
 -- Matrix Calcuation Helpers
-function Transform.GetGlobalPos(transform)
-    local gPos = vec2(transform.pos:unpack())
-    
-    if transform.parent then
-        gPos = gPos + Transform.GetGlobalPos(transform.parent)
-    end
-    
-    return gPos
-end
-
-function Transform.GetGlobalRot(transform)
-    local gRot = transform.rot ~= 0 and transform.rot or 1
-    
-    if transform.parent then
-        gRot = Transform.GetGlobalRot(transform.parent) * gRot
-    end
-    
-    return gRot
-end
-
-function Transform.GetGlobalScale(transform)
-    local scl = vec2(transform.scale:unpack())
-    
-    if transform.parent then
-        scl = Transform.GetGlobalRot(transform.parent) * scl
-    end
-    
-    return scl
-end
-
-
-
-function Transform.GetGlobalCTM(transform)
+function Transform.CTM(transform)
     local pos = transform.pos
     local rot = transform.rot
     local scl = transform.scale
@@ -63,13 +33,13 @@ function Transform.GetGlobalCTM(transform)
     m = m:rotate(rot, 0, 0, 1)
     m = m:scale(scl.x, scl.y, 1)
     if transform.parent then
-        return m * Transform.GetGlobalCTM(transform.parent)
+        return m * Transform.CTM(transform.parent)
     end
     return m
 end
 
 function Transform.PosToScreenPos(transform)
-    local gm = transform.mtx or Transform.GetGlobalCTM(transform)
+    local gm = transform.mtx or Transform.CTM(transform)
     local sctm = gm * viewMatrix() -- * projectionMatrix()
     return vec2(sctm[13], sctm[14])
 end
@@ -92,6 +62,28 @@ function applyRotation(rot, m)
     return m
 end
 -- getters
+function Transform:isNeedsLayout()
+    local isNeeds = false
+    self.lastPos = self.lastPos or nil
+    self.lastRot = self.lastRot or nil
+    self.lastScale = self.lastScale or nil
+    
+    isNeeds = (self.lastPos ~= self.pos
+        or self.lastRot ~= self.rot
+        or self.lastScale ~= self.scale)
+    if isNeeds then
+        return true
+    end
+    if self.parent then
+        isNeeds = self.parent:isNeedsLayout() or self.parent.didUpdate
+    end
+    return isNeeds
+end
+function Transform:setSelfDidLayout()
+    self.lastPos = vec2(self.pos:unpack())
+    self.lastRot = self.rot
+    self.lastScale = vec2(self.scale:unpack())
+end
 function Transform:rotAngle()
     local fx, fy = self.forward:unpack()
     local angle = math.atan2(fy, fx)
@@ -119,31 +111,27 @@ function Transform:inBounds(t)
 end
 --
 function Transform:update()
-    local didUpdate = false
-    local wPos = Transform.GetGlobalPos(self)
-    local gRot = Transform.GetGlobalRot(self)
-    local gScl = Transform.GetGlobalScale(self)
-
-    self.lastPos = self.lastPos or nil
-    self.lastRot = self.lastRot or nil
-    self.lastScale = self.lastScale or nil
-    self.globalPos = vec2(wPos:unpack())
-    self.globalRot = gRot
-    self.globalScale = gScl
-    -- is Pos dirty
-    local isDirty = self.lastPos == nil or self.lastPos.x ~= wPos.x or self.lastPos.y ~= wPos.y
-    isDirty = isDirty or self.lastRot == nil or self.lastRot ~= gRot
-    
-    isDirty = isDirty or self.lastScale == nil or self.lastScale.x ~= gScl.x or self.lastScale.y ~= gScl.y
+    local isDirty = self:isNeedsLayout()
     if isDirty then
-        self.mtx = Transform.GetGlobalCTM(self)
+        self.mtx = Transform.CTM(self)
+        -- forward
         self.forward = vec2(self.mtx[1], self.mtx[2]):normalize()
-        self.lastPos = vec2(wPos:unpack())
-        self.lastRot = gRot
-        self.lastScale = vec2(gScl:unpack())
-        didUpdate = true
+        -- global position
+        self.globalPos = vec2(self.mtx[13], self.mtx[14])
+        
+        -- global rotation
+        local fx, fy = self.forward:unpack()
+        local angle = math.atan2(fy, fx)
+        self.globalRot = angle * mathX.rad2deg
+        
+        -- global scale
+        self.globalScale = vec2(self.mtx[1]/1, self.mtx[6]/1)
+        self:setSelfDidLayout()
+        self.didUpdate = true
+    else
+        self.didUpdate = false
     end
-    return didUpdate
+    return self.didUpdate
 end
 
 function Transform:draw()
@@ -155,36 +143,6 @@ function Transform:draw()
         self.onDraw(self)
         popMatrix() popStyle()
     end
-    --[[
-    pushMatrix() pushStyle()
-    resetMatrix()
-    modelMatrix(self.mtx)
-    rectMode(self.mode)
-    textMode(self.mode)
-    local b = self:boundingBox()
-    local x2 = b.x + b.w
-    local y2 = b.y + b.h
-    fill(242, 89, 43)
-    rect(0,0, b.w, b.h)
-    fill(104, 233, 80)
-    ellipse(b.w/2, b.h/2, 10)
-    fill(214)
-    fontSize(12)
-    textWrapWidth(50)
-    text(
-    'x: ' .. b.x .. ', y: ' .. b.y .. ', xw: ' .. x2 .. ', yh:' .. y2,
-    0,
-    0
-    )
-    pushMatrix()
-    resetMatrix()
-    strokeWidth(5)
-    stroke(191, 233, 80)
-    noFill()
-    line(b.x, b.y, x2, y2)
-    popMatrix()
-    popMatrix() popStyle()
-    --]]
 end
 
 function Transform:touched(touch)
