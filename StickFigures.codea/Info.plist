@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Buffer Order</key>
+	<array>
+		<string>DottedCircle</string>
+		<string>Transform</string>
+		<string>Gizmo</string>
+		<string>T2DEditor</string>
+		<string>Stick</string>
+		<string>Bone</string>
+		<string>Circle</string>
+		<string>Transform2D</string>
+		<string>Main</string>
+	</array>
+	<key>Dependencies</key>
+	<array>
+		<string>Documents:mathX</string>
+		<string>Craft:Touches</string>
+	</array>
+</dict>
+</plist>
