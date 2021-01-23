@@ -11,8 +11,8 @@
 		<string>Stick</string>
 		<string>Bone</string>
 		<string>Circle</string>
-		<string>Transform2D</string>
 		<string>Main</string>
+		<string>TransformNotes</string>
 	</array>
 	<key>Dependencies</key>
 	<array>
